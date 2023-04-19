@@ -1,9 +1,10 @@
 import { Inter } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Products from "@/components/Products";
 import { GetServerSideProps } from "next";
 import { initMongoose } from "@/lib/mongoose";
 import { findAllProducts } from "./api/products";
+import Layout from "@/components/Layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,17 +24,14 @@ type ProductsProps = {
 export default function Home({ products }: ProductsProps) {
   const [phrase, setPhrase] = useState('')
 
-  // console.log({ productsInfo });
-
   const categoriesNames = Array.from(new Set(products.map(p => p.category)));
-  // console.log({ categoriesNames });
 
   if (phrase) {
     products = products.filter(p => p.name.toLowerCase().includes(phrase));
   }
 
   return (
-    <div className="p-5">
+    <Layout>
       <input type="text" value={phrase} onChange={e => setPhrase(e.target.value)} placeholder="Search for products..." className="bg-gray-100 w-full py-2 px-4 rounded-xl"></input>
       <div>
         {categoriesNames.map(categoryName => (
@@ -54,7 +52,7 @@ export default function Home({ products }: ProductsProps) {
           </div>
         ))}
       </div>
-    </div>
+    </Layout>
   );
 }
 
