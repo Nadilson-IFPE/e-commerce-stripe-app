@@ -1,6 +1,9 @@
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
 import Products from "@/components/Products";
+import { GetServerSideProps } from "next";
+import { initMongoose } from "@/lib/mongoose";
+import { findAllProducts } from "./api/products";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,24 +16,20 @@ interface IProducts {
   picture: string,
 }
 
-export default function Home() {
-  const [productsInfo, setProductsInfo] = useState<IProducts[]>([]);
-  const [phrase, setPhrase] = useState('')
+type ProductsProps = {
+  products: Array<IProducts>
+}
 
-  useEffect(() => {
-    fetch("/api/products")
-      .then((response) => response.json())
-      .then((json) => setProductsInfo(json));
-  }, []);
+export default function Home({ products }: ProductsProps) {
+  const [phrase, setPhrase] = useState('')
 
   // console.log({ productsInfo });
 
-  const categoriesNames = Array.from(new Set(productsInfo.map(p => p.category)));
+  const categoriesNames = Array.from(new Set(products.map(p => p.category)));
   // console.log({ categoriesNames });
 
-  let products = productsInfo;
   if (phrase) {
-    products = productsInfo.filter(p => p.name.toLowerCase().includes(phrase));
+    products = products.filter(p => p.name.toLowerCase().includes(phrase));
   }
 
   return (
@@ -58,3 +57,18 @@ export default function Home() {
     </div>
   );
 }
+
+
+export const getServerSideProps: GetServerSideProps = async () => {
+
+  await initMongoose();
+
+  const products = await findAllProducts()
+
+  return {
+    props: {
+      products: JSON.parse(JSON.stringify(products)),
+    },
+  }
+}
+
