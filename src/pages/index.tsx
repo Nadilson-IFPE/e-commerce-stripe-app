@@ -1,11 +1,20 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
+import Products from "@/components/Products";
 
 const inter = Inter({ subsets: ["latin"] });
 
+interface IProducts {
+  _id: string,
+  name: string,
+  description: string,
+  price: number,
+  category: string,
+  picture: string,
+}
+
 export default function Home() {
-  const [productsInfo, setProductsInfo] = useState([]);
+  const [productsInfo, setProductsInfo] = useState<IProducts[]>([]);
 
   useEffect(() => {
     fetch("/api/products")
@@ -15,31 +24,29 @@ export default function Home() {
 
   // console.log({ productsInfo });
 
+  const categoriesNames = Array.from(new Set(productsInfo.map(p => p.category)));
+  // console.log({ categoriesNames });
+
   return (
     <div className="p-5">
+      <input type="text" placeholder="Procurar produtos..." className="bg-gray-100 w-full py-2 px-4 rounded-xl"></input>
       <div>
-        <h2 className="text-2xl">Mobiles</h2>
-        <div className="py-4">
-          <div className="w-64">
-            <div className="bg-blue-100 p-5 rounded-xl">
-              <img src="/products/iphone.png" alt="" />
-            </div>
-            <div className="mt-2">
-              <h3 className="font-bold text-lg">iPhone</h3>
-            </div>
-            <p className="text-sm mt-1 leading-4">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam
-              molestias aliquid voluptas, autem atque praesentium nostrum nihil
-              expedita? Ab est excepturi quas repellat. Esse minima laborum at
-              excepturi accusamus architecto.
-            </p>
-            <div className="flex mt-1">
-              <div className="text-2xl font-bold grow">R$ 10.000,00</div>
-              <button className="bg-emerald-400 text-white py-1 px-3 rounded-xl">
-                +
-              </button>
+        {categoriesNames.map(categoryName => (
+          <div key={categoryName} id={categoryName}>
+            <h2 className="text-2xl py-5 capitalize">{categoryName}</h2>
+
+            <div className="flex -mx-5 overflow-x-scroll snap-x scrollbar-hide">
+              {productsInfo.filter(p => p.category === categoryName).map(productInfo => (
+                <div key={productInfo._id} className="px-5 snap-start">
+                  <Products {...productInfo} />
+                </div>
+              ))}
             </div>
           </div>
+        ))}
+
+        <div className="py-4">
+
         </div>
       </div>
     </div>
