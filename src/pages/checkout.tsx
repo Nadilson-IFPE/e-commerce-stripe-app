@@ -17,7 +17,7 @@ type ProductsProps = {
 
 export default function CheckoutPage({ products }: ProductsProps) {
     const { selectedProducts, setSelectedProducts } = useContext(ProductsContext);
-    const [productsInfos, setProductsInfos] = useState<IProducts[]>([]);
+    const [productsInfos, setProductsInfos] = useState<typeof products>([]);
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
     const [name, setName] = useState('');
@@ -47,7 +47,7 @@ export default function CheckoutPage({ products }: ProductsProps) {
     let subtotal = 0;
     if (selectedProducts?.length) {
         for (let id of selectedProducts) {
-            const price = productsInfos.find((p: any) => p._id === id)?.price || 0;
+            const price = productsInfos.find((p) => p._id === id.toString())?.price || 0;
             subtotal += price;
         }
     }
@@ -56,10 +56,10 @@ export default function CheckoutPage({ products }: ProductsProps) {
     return (
         <Layout>
             {!productsInfos.length && (
-                <div>no products in your shopping cart</div>
+                <div>No products in your shopping cart!</div>
             )}
             {productsInfos.length && productsInfos.map(productInfo => {
-                const amount = selectedProducts.filter((id: any) => id === productInfo._id).length;
+                const amount = selectedProducts.filter((id) => id.toString() === productInfo._id).length;
                 if (amount === 0) return;
                 return (
                     <div className="flex mb-5 items-center" key={productInfo._id}>
