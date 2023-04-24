@@ -1,4 +1,5 @@
 import { initMongoose } from "@/lib/mongoose";
+import Order from "@/models/Order";
 import Product from "@/models/Products";
 import { NextApiRequest, NextApiResponse } from "next";
 const stripe = require('stripe')(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY);
@@ -24,12 +25,21 @@ export default async function handler(req: NextApiRequest,
         line_items.push({
             quantity,
             price_data: {
-                currency: 'USD',
+                currency: 'BRL',   // Or: 'USD'
                 product_data: { name: product.name },
                 unit_amount: product.price * 100,
             },
         });
     }
+
+    const order = await Order.create({
+        products: line_items,
+        name,
+        email,
+        address,
+        city,
+        paid: 0,
+    });
 
     const session = await stripe.checkout.sessions.create({
         line_items: line_items,
@@ -37,6 +47,7 @@ export default async function handler(req: NextApiRequest,
         customer_email: email,
         success_url: `${req.headers.origin}/?success=true`,
         cancel_url: `${req.headers.origin}/?canceled=true`,
+        metadata: { orderId: order._id.toString() },
     });
 
     res.redirect(303, session.url);
