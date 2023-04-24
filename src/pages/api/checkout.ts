@@ -45,6 +45,9 @@ export default async function handler(req: NextApiRequest,
         line_items: line_items,
         mode: 'payment',
         customer_email: email,
+        /* automatic_tax: {
+            enabled: true,
+        }, */
         success_url: `${req.headers.origin}/?success=true`,
         cancel_url: `${req.headers.origin}/?canceled=true`,
         metadata: { orderId: order._id.toString() },
