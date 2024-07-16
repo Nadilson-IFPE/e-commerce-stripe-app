@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout'
 import { ProductsContext } from '@/components/ProductsContext';
+import Image from 'next/image';
 import { useContext, useEffect, useState } from 'react';
 
 interface IProducts {
@@ -15,7 +16,7 @@ type ProductsProps = {
     products: Array<IProducts>
 }
 
-export default function CheckoutPage({ products }: ProductsProps) {
+export default function CheckoutPage({ products }: ProductsProps): JSX.Element {
     const { selectedProducts, setSelectedProducts } = useContext(ProductsContext);
     const [productsInfos, setProductsInfos] = useState<typeof products>([]);
     const [address, setAddress] = useState('');
@@ -61,10 +62,11 @@ export default function CheckoutPage({ products }: ProductsProps) {
             {productsInfos.length && productsInfos.map(productInfo => {
                 const amount = selectedProducts.filter((id) => id.toString() === productInfo._id).length;
                 if (amount === 0) return;
+                console.log("total: " + total)
                 return (
                     <div className="flex mb-5 items-center" key={productInfo._id}>
                         <div className="bg-gray-100 p-3 rounded-xl shrink-0" style={{ boxShadow: 'inset 1px 0px 10px 10px rgba(0,0,0,0.1)' }}>
-                            <img className="w-24" src={productInfo.picture} alt="" />
+                            <Image className="w-24" src={productInfo.picture} alt="" width={96} height={96} />
                         </div>
                         <div className="pl-4 items-center">
                             <h3 className="font-bold text-lg">{productInfo.name}</h3>
@@ -74,7 +76,7 @@ export default function CheckoutPage({ products }: ProductsProps) {
                                 <div>
                                     <button onClick={() => lessOfThisProduct(productInfo._id)} className="border border-emerald-500 px-2 rounded-lg text-emerald-500">-</button>
                                     <span className="px-2">
-                                        {selectedProducts.filter((id: any) => id === productInfo._id).length}
+                                        {selectedProducts.filter((id) => id.toString() === productInfo._id).length}
                                     </span>
                                     <button onClick={() => moreOfThisProduct(productInfo._id)} className="bg-emerald-500 px-2 rounded-lg text-white">+</button>
                                 </div>
@@ -105,6 +107,7 @@ export default function CheckoutPage({ products }: ProductsProps) {
                     </div>
                 </div>
                 <input type="hidden" name="products" value={selectedProducts.join(',')} />
+                <input type="hidden" name="delivery_fee" value={deliveryPrice} />
                 <button type="submit" className="bg-emerald-500 px-5 py-2 rounded-xl font-bold text-white w-full my-4 shadow-emerald-300 shadow-lg">Pay {total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</button>
             </form>
         </Layout>

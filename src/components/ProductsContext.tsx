@@ -22,8 +22,8 @@ interface ProductsContextData {
 
 export const ProductsContext = createContext<ProductsContextData>({} as ProductsContextData);
 
-export function ProductsContextProvider({ children }: ProductsContextProviderProps) {
-    const [selectedProducts, setSelectedProducts] = useLocalStorageState('cart', { defaultValue: [] });
+export function ProductsContextProvider({ children, }: ProductsContextProviderProps): JSX.Element {
+    const [selectedProducts, setSelectedProducts] = useLocalStorageState<any[]>('cart', { defaultValue: [] });
     return (
         <ProductsContext.Provider value={{ selectedProducts, setSelectedProducts }}>
             {children}

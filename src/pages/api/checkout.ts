@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest,
         return;
     }
 
-    const { email, name, address, city } = req.body;
+    const { email, name, address, city, delivery_fee } = req.body;
     const productsIds = req.body.products.split(',');
     const uniqIds = [...new Set(productsIds)];
     const products = await Product.find({ _id: { $in: uniqIds } }).exec();
@@ -28,6 +28,17 @@ export default async function handler(req: NextApiRequest,
                 currency: 'BRL',   // Or: 'USD'
                 product_data: { name: product.name },
                 unit_amount: product.price * 100,
+            },
+        });
+    }
+
+    if (delivery_fee) {
+        line_items.push({
+            quantity: 1,
+            price_data: {
+                currency: 'BRL',   // Ou: 'USD'
+                product_data: { name: 'Taxa de Entrega' }, //Delivery fee
+                unit_amount: delivery_fee * 100,
             },
         });
     }
